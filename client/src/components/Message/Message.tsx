@@ -25,8 +25,8 @@ import useMessageInput from "components/MessageInput/useMessageInput";
 interface IMessage {
   id: string;
   content: string;
-  author: Member;
-  date: string;
+  author: Partial<Pick<Member, "avatarUrl" | "color" | "name">>;
+  date?: string;
   isAuthor?: boolean;
 }
 
@@ -97,7 +97,9 @@ const Message: React.FC<IMessage> = ({
       <Flex direction="column">
         <Flex gap="medium" align="center" nowrap>
           <Avatar size={35} src={author?.avatarUrl} />
-          <p className="textcolor--primary">{author?.name}</p>
+          <p className="textcolor--primary" style={{ color: author?.color }}>
+            {author?.name}
+          </p>
           <span className="message__date">messaged {timeAgo(date)}</span>
           {isAuthor && (
             <Flex
@@ -153,6 +155,10 @@ const Message: React.FC<IMessage> = ({
       </Flex>
     </StyledMessage>
   );
+};
+
+Message.defaultProps = {
+  date: new Date().toString(),
 };
 
 export default Message;

@@ -60,6 +60,8 @@ export type Me = {
   email: Scalars['String'];
   avatarUrl: Scalars['String'];
   rooms: Array<Room>;
+  color: Scalars['String'];
+  links?: Maybe<UserLinks>;
 };
 
 
@@ -82,6 +84,16 @@ export type Member = {
   username: Scalars['String'];
   avatarUrl: Scalars['String'];
   rooms: Array<Scalars['ID']>;
+  links?: Maybe<UserLinks>;
+  color: Scalars['String'];
+};
+
+export type UserLinks = {
+  __typename?: 'UserLinks';
+  github?: Maybe<Scalars['String']>;
+  twitter?: Maybe<Scalars['String']>;
+  instagram?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
 };
 
 export type Message = {
@@ -101,6 +113,8 @@ export type User = {
   name: Scalars['String'];
   username: Scalars['String'];
   rooms: Array<Room>;
+  color: Scalars['String'];
+  links?: Maybe<UserLinks>;
 };
 
 export type Messages = {
@@ -139,6 +153,8 @@ export type InvitationDetails = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  setColor: Member;
+  setUserLinks: Member;
   logout: Scalars['Boolean'];
   sendMessage: Message;
   deleteMessage: Message;
@@ -150,6 +166,19 @@ export type Mutation = {
   createInvitationLink: InvitationLinkResult;
   inviteMembers: Array<Invitation>;
   acceptInvitation: Scalars['Boolean'];
+};
+
+
+export type MutationSetColorArgs = {
+  color: Scalars['String'];
+};
+
+
+export type MutationSetUserLinksArgs = {
+  github?: Maybe<Scalars['String']>;
+  twitter?: Maybe<Scalars['String']>;
+  instagram?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
 };
 
 
@@ -330,7 +359,7 @@ export type GetRoomQuery = (
       & Pick<Message, 'id' | 'roomId' | 'content' | 'createdAt' | 'mentions'>
       & { author: (
         { __typename?: 'Member' }
-        & Pick<Member, 'id' | 'name' | 'username' | 'avatarUrl'>
+        & Pick<Member, 'id' | 'name' | 'username' | 'avatarUrl' | 'color'>
       ) }
     )> }
   ) }
@@ -390,7 +419,7 @@ export type SubscriptionMessagePartsFragment = (
   & Pick<Message, 'id' | 'content' | 'roomId' | 'createdAt' | 'mentions'>
   & { author: (
     { __typename?: 'Member' }
-    & Pick<Member, 'id' | 'name' | 'username' | 'avatarUrl'>
+    & Pick<Member, 'id' | 'name' | 'username' | 'avatarUrl' | 'color'>
   ) }
 );
 
@@ -407,7 +436,7 @@ export type SendMessageMutation = (
     & Pick<Message, 'id' | 'roomId' | 'content' | 'createdAt' | 'mentions'>
     & { author: (
       { __typename?: 'Member' }
-      & Pick<Member, 'id' | 'name' | 'username' | 'avatarUrl'>
+      & Pick<Member, 'id' | 'name' | 'username' | 'avatarUrl' | 'color'>
     ) }
   ) }
 );
@@ -494,8 +523,11 @@ export type CurrentUserQuery = (
   { __typename?: 'Query' }
   & { me: (
     { __typename?: 'Me' }
-    & Pick<Me, 'id' | 'name' | 'email' | 'username' | 'avatarUrl'>
-    & { rooms: Array<(
+    & Pick<Me, 'id' | 'name' | 'email' | 'username' | 'avatarUrl' | 'color'>
+    & { links?: Maybe<(
+      { __typename?: 'UserLinks' }
+      & Pick<UserLinks, 'github' | 'twitter' | 'instagram' | 'website'>
+    )>, rooms: Array<(
       { __typename?: 'Room' }
       & Pick<Room, 'id' | 'name' | 'owner'>
     )> }
@@ -509,7 +541,11 @@ export type ListUsersQuery = (
   { __typename?: 'Query' }
   & { users: Array<(
     { __typename?: 'Member' }
-    & Pick<Member, 'id' | 'name' | 'avatarUrl' | 'username' | 'rooms' | 'createdAt'>
+    & Pick<Member, 'id' | 'name' | 'avatarUrl' | 'username' | 'color' | 'rooms' | 'createdAt'>
+    & { links?: Maybe<(
+      { __typename?: 'UserLinks' }
+      & Pick<UserLinks, 'github' | 'twitter' | 'instagram' | 'website'>
+    )> }
   )> }
 );
 
@@ -545,6 +581,63 @@ export type ReadNotificationMutation = (
   & { readNotification: (
     { __typename?: 'Notification' }
     & NotificationDataFragment
+  ) }
+);
+
+export type SetUserColorMutationVariables = {
+  color: Scalars['String'];
+};
+
+
+export type SetUserColorMutation = (
+  { __typename?: 'Mutation' }
+  & { setColor: (
+    { __typename?: 'Member' }
+    & Pick<Member, 'id' | 'color'>
+  ) }
+);
+
+export type SetUserLinksMutationVariables = {
+  github?: Maybe<Scalars['String']>;
+  twitter?: Maybe<Scalars['String']>;
+  instagram?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
+};
+
+
+export type SetUserLinksMutation = (
+  { __typename?: 'Mutation' }
+  & { setUserLinks: (
+    { __typename?: 'Member' }
+    & Pick<Member, 'id'>
+    & { links?: Maybe<(
+      { __typename?: 'UserLinks' }
+      & Pick<UserLinks, 'github' | 'twitter' | 'instagram' | 'website'>
+    )> }
+  ) }
+);
+
+export type SetUserSettingsMutationVariables = {
+  color: Scalars['String'];
+  github?: Maybe<Scalars['String']>;
+  twitter?: Maybe<Scalars['String']>;
+  instagram?: Maybe<Scalars['String']>;
+  website?: Maybe<Scalars['String']>;
+};
+
+
+export type SetUserSettingsMutation = (
+  { __typename?: 'Mutation' }
+  & { setColor: (
+    { __typename?: 'Member' }
+    & Pick<Member, 'id' | 'color'>
+  ), setUserLinks: (
+    { __typename?: 'Member' }
+    & Pick<Member, 'id'>
+    & { links?: Maybe<(
+      { __typename?: 'UserLinks' }
+      & Pick<UserLinks, 'github' | 'twitter' | 'instagram' | 'website'>
+    )> }
   ) }
 );
 
@@ -601,6 +694,7 @@ export const SubscriptionMessagePartsFragmentDoc = gql`
     name
     username
     avatarUrl
+    color
   }
 }
     `;
@@ -785,6 +879,7 @@ export const GetRoomDocument = gql`
         name
         username
         avatarUrl
+        color
       }
     }
   }
@@ -934,6 +1029,7 @@ export const SendMessageDocument = gql`
       name
       username
       avatarUrl
+      color
     }
   }
 }
@@ -1124,6 +1220,13 @@ export const CurrentUserDocument = gql`
     email
     username
     avatarUrl
+    color
+    links {
+      github
+      twitter
+      instagram
+      website
+    }
     rooms {
       id
       name
@@ -1164,8 +1267,15 @@ export const ListUsersDocument = gql`
     name
     avatarUrl
     username
+    color
     rooms
     createdAt
+    links {
+      github
+      twitter
+      instagram
+      website
+    }
   }
 }
     `;
@@ -1293,6 +1403,126 @@ export function useReadNotificationMutation(baseOptions?: ApolloReactHooks.Mutat
 export type ReadNotificationMutationHookResult = ReturnType<typeof useReadNotificationMutation>;
 export type ReadNotificationMutationResult = ApolloReactCommon.MutationResult<ReadNotificationMutation>;
 export type ReadNotificationMutationOptions = ApolloReactCommon.BaseMutationOptions<ReadNotificationMutation, ReadNotificationMutationVariables>;
+export const SetUserColorDocument = gql`
+    mutation setUserColor($color: String!) {
+  setColor(color: $color) {
+    id
+    color
+  }
+}
+    `;
+export type SetUserColorMutationFn = ApolloReactCommon.MutationFunction<SetUserColorMutation, SetUserColorMutationVariables>;
+
+/**
+ * __useSetUserColorMutation__
+ *
+ * To run a mutation, you first call `useSetUserColorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetUserColorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setUserColorMutation, { data, loading, error }] = useSetUserColorMutation({
+ *   variables: {
+ *      color: // value for 'color'
+ *   },
+ * });
+ */
+export function useSetUserColorMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetUserColorMutation, SetUserColorMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetUserColorMutation, SetUserColorMutationVariables>(SetUserColorDocument, baseOptions);
+      }
+export type SetUserColorMutationHookResult = ReturnType<typeof useSetUserColorMutation>;
+export type SetUserColorMutationResult = ApolloReactCommon.MutationResult<SetUserColorMutation>;
+export type SetUserColorMutationOptions = ApolloReactCommon.BaseMutationOptions<SetUserColorMutation, SetUserColorMutationVariables>;
+export const SetUserLinksDocument = gql`
+    mutation setUserLinks($github: String, $twitter: String, $instagram: String, $website: String) {
+  setUserLinks(github: $github, twitter: $twitter, instagram: $instagram, website: $website) {
+    id
+    links {
+      github
+      twitter
+      instagram
+      website
+    }
+  }
+}
+    `;
+export type SetUserLinksMutationFn = ApolloReactCommon.MutationFunction<SetUserLinksMutation, SetUserLinksMutationVariables>;
+
+/**
+ * __useSetUserLinksMutation__
+ *
+ * To run a mutation, you first call `useSetUserLinksMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetUserLinksMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setUserLinksMutation, { data, loading, error }] = useSetUserLinksMutation({
+ *   variables: {
+ *      github: // value for 'github'
+ *      twitter: // value for 'twitter'
+ *      instagram: // value for 'instagram'
+ *      website: // value for 'website'
+ *   },
+ * });
+ */
+export function useSetUserLinksMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetUserLinksMutation, SetUserLinksMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetUserLinksMutation, SetUserLinksMutationVariables>(SetUserLinksDocument, baseOptions);
+      }
+export type SetUserLinksMutationHookResult = ReturnType<typeof useSetUserLinksMutation>;
+export type SetUserLinksMutationResult = ApolloReactCommon.MutationResult<SetUserLinksMutation>;
+export type SetUserLinksMutationOptions = ApolloReactCommon.BaseMutationOptions<SetUserLinksMutation, SetUserLinksMutationVariables>;
+export const SetUserSettingsDocument = gql`
+    mutation setUserSettings($color: String!, $github: String, $twitter: String, $instagram: String, $website: String) {
+  setColor(color: $color) {
+    id
+    color
+  }
+  setUserLinks(github: $github, twitter: $twitter, instagram: $instagram, website: $website) {
+    id
+    links {
+      github
+      twitter
+      instagram
+      website
+    }
+  }
+}
+    `;
+export type SetUserSettingsMutationFn = ApolloReactCommon.MutationFunction<SetUserSettingsMutation, SetUserSettingsMutationVariables>;
+
+/**
+ * __useSetUserSettingsMutation__
+ *
+ * To run a mutation, you first call `useSetUserSettingsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetUserSettingsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setUserSettingsMutation, { data, loading, error }] = useSetUserSettingsMutation({
+ *   variables: {
+ *      color: // value for 'color'
+ *      github: // value for 'github'
+ *      twitter: // value for 'twitter'
+ *      instagram: // value for 'instagram'
+ *      website: // value for 'website'
+ *   },
+ * });
+ */
+export function useSetUserSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetUserSettingsMutation, SetUserSettingsMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetUserSettingsMutation, SetUserSettingsMutationVariables>(SetUserSettingsDocument, baseOptions);
+      }
+export type SetUserSettingsMutationHookResult = ReturnType<typeof useSetUserSettingsMutation>;
+export type SetUserSettingsMutationResult = ApolloReactCommon.MutationResult<SetUserSettingsMutation>;
+export type SetUserSettingsMutationOptions = ApolloReactCommon.BaseMutationOptions<SetUserSettingsMutation, SetUserSettingsMutationVariables>;
 export const OnNewNotificationDocument = gql`
     subscription onNewNotification {
   onNewNotification {

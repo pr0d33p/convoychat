@@ -9,6 +9,26 @@ enum Providers {
   GITHUB = 'github',
 }
 
+@ObjectType()
+@modelOptions({ schemaOptions: { _id: false } })
+export class UserLinks {
+  @Field({ nullable: true })
+  @Property({ minlength: 5, maxlength: 100 })
+  public github?: string
+
+  @Field({ nullable: true })
+  @Property({ minlength: 5, maxlength: 100 })
+  public twitter?: string
+
+  @Field({ nullable: true })
+  @Property({ minlength: 5, maxlength: 100 })
+  public instagram?: string
+
+  @Field({ nullable: true })
+  @Property({ minlength: 5, maxlength: 100 })
+  public website?: string
+}
+
 @modelOptions({
   options: { customName: 'user', },
   schemaOptions: {
@@ -37,6 +57,14 @@ export class User {
   @Field(type => [Room])
   @arrayProp({ ref: 'room' })
   public rooms!: Ref<Room>[];
+
+  @Field()
+  @Property({ default: '#64FF8F' })
+  public color!: string;
+
+  @Field(type => UserLinks, { nullable: true })
+  @Property({ type: UserLinks, default: {} })
+  public links!: UserLinks;
 
   @Property({ required: true, unique: true })
   public email!: string;
